@@ -1,6 +1,6 @@
 ---
 layout: post
-title: tcp长连接负载均衡
+title: tcp连接负载均衡
 date: 2016-06-29 10:57:41
 tags: linux
 categories: 编程
