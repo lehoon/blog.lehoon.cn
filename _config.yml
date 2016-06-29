@@ -44,12 +44,14 @@ highlight:
   tab_replace:
 
 # Category & Tag
-default_category: uncategorized
+default_category: 编程
 category_map:
 	编程: program
 	生活: life
+  项目: project
 	学习: study
   其他: orther
+  关于: about
 tag_map:
   go: golang
   c/c++: c
@@ -61,6 +63,8 @@ tag_map:
   php: php
   python: python
   shell: shell
+  about: about
+  project: project
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date

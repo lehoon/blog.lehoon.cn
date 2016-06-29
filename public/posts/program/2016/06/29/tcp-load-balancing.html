@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>tcp长连接负载均衡 | Lehoon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.   **LVS 性能最强**
+1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。
+分为3种模式：
+l  DR：性能最好
+在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。
+优点：性能最高、流量小
+缺点：机器都需要在同一个Vlan下，R">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tcp长连接负载均衡">
+<meta property="og:url" content="http://blog.lehoon.cn/posts/program/2016/06/29/tcp-load-balancing.html">
+<meta property="og:site_name" content="Lehoon">
+<meta property="og:description" content="1.   **LVS 性能最强**
+1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。
+分为3种模式：
+l  DR：性能最好
+在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。
+优点：性能最高、流量小
+缺点：机器都需要在同一个Vlan下，R">
+<meta property="og:updated_time" content="2016-06-29T03:43:24.690Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tcp长连接负载均衡">
+<meta name="twitter:description" content="1.   **LVS 性能最强**
+1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。
+分为3种模式：
+l  DR：性能最好
+在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。
+优点：性能最高、流量小
+缺点：机器都需要在同一个Vlan下，R">
+  
+    <link rel="alternative" href="/atom.xml" title="Lehoon" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="http://7lrwpn.com1.z0.glb.clouddn.com/xiaowandou.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">lehoon</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tags</li>
+						
+						
+						<li>Über</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">文章</a></li>
+				        
+							<li><a href="/project">项目</a></li>
+				        
+							<li><a href="/about">关于</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a>
+					</div>
+				</section>
+				
+				
+				
+
+				
+				
+				<section class="switch-part switch-part3">
+				
+					<div id="js-aboutme">lehoon…</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">lehoon</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+			
+				<img lazy-src="http://7lrwpn.com1.z0.glb.clouddn.com/xiaowandou.jpg" class="js-avatar">
+			
+			</div>
+			<hgroup>
+			  <h1 class="header-author">lehoon</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">文章</a></li>
+		        
+					<li><a href="/project">项目</a></li>
+		        
+					<li><a href="/about">关于</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap"><article id="post-tcp-load-balancing" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/posts/program/2016/06/29/tcp-load-balancing.html" class="article-date">
+  	<time datetime="2016-06-29T02:57:41.000Z" itemprop="datePublished">2016-06-29</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      tcp长连接负载均衡
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+	</div>
+
+        
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/program/">编程</a>
+	</div>
+
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>1.   **</strong>LVS<strong> </strong>性能最强**</p>
+<p><span style="line-height: 1.5;">1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。</span></p>
+<p>分为3种模式：</p>
+<p>l  DR：性能最好</p>
+<p>在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。</p>
+<p><strong>优点</strong>：性能最高、流量小</p>
+<p><strong>缺点</strong>：机器都需要在同一个Vlan下，Real Server 之间无法通过VIP通信。需要抑制VIP ARP 有风险。</p>
+<p>l  IP Tunnel 性能适中</p>
+<p>使用IPIP封包，解决跨Vlan问题，相比DR 就多了一层IP封装，也是只处理请求。</p>
+<p><strong>优点</strong>：跨Vlan</p>
+<p><strong>缺点</strong>：虽然应用最为广泛，但windows 不支持IPIP。</p>
+<p>l  NAT</p>
+<p>与前两种相比，不需要绑定VIP，但也要修改路由，RealServer 所有流量都需要经过，需要处理很多无用流量，一般实用性很差。</p>
+<p><strong>优点：</strong>不需要要绑定VIP、跨VLAN</p>
+<p>支持RS 通过VIP访问RS本身，需要对RS做抑制路由操作，所有流量直接发给网关。</p>
+<p><strong>缺点</strong>：对于请求为SNAT，应答为DNAT。为实现DNAT，需要将RS 的默认网关指向VS</p>
+<p>VS 被当成网关处理，RealServer所有的流量都将发给VS，VS的带宽压力会很大。</p>
+<p><strong>配置工具</strong>：如果使用ReadHat版本，可以使用<a href="http://www.linuxvirtualserver.org/docs/ha/piranha.html" target="_blank" rel="external"><strong>Piranha</strong></a> 提供的WEB UI工具配置，配置为需要手动同步一下主板配置。</p>
+<p>　　　　如果需要部署多个实例，而且经常改动，Piranha 将提供很友好的配置环境。</p>
+<p><strong>2. HaProxy 性能高，处理高并发、高连接</strong></p>
+<p><strong>优点：</strong></p>
+<p>l  性能高，20w连接下，处理10w/s请求</p>
+<p> （单进程处理性能1w/s样子，为更好利用多核，多进程模式提升空间很少，需要开启多个实例，这样一来前端必须上LVS负载多个实例端口）</p>
+<p>l  7层、4层都行</p>
+<p>l  不限于VLan ，只要网络策略通即可</p>
+<p>l  可配性高</p>
+<p>l  监控完善</p>
+<p><strong> 注意点：</strong></p>
+<p>l Src IP被修改，业务中publicIP应该从 x-forward-for中获取（Haproxy也支持透明代理，就像LVS的NAT模式，存在问题）</p>
+<p>l 流量double，千M网卡最多也只能支持500M流量</p>
+<p><span style="line-height: 1.5;"> 连接数超过65535时，需要考虑绑定多个IP</span></p>
+<p>Tcp 转发性能要比nginx要好。</p>
+<p>HaProxy 是默认单线程、也是最高效方式；也可以支持多线程（进程），但监控会随机请求到的业务、部分功能无法正常使用。</p>
+<p><span style="line-height: 1.5;"> </span></p>
+<p><strong>3. Nginx 专注于7层高并发，但不善于处理1w+连接数</strong></p>
+<p>要支持4层需要另外的patch，而且高连接数时性能无法和haproxy相比。</p>
+<p>默认1个master+ 多个（核心）Worker，可充分利用多核资源。</p>
+<p>Master和worker之间通过进程通信实现，有点像IIS5，相比II6 性能要差些。</p>
+<p><span style="line-height: 1.5;"> </span></p>
+<p>**不管HaProxy还是Nginx 都存在一个问题，就是只有一个线程在做Receive，也就是无法均衡软中断。</p>
+<p> 对于主要的四层负载，用户态执行时间很短，性能瓶颈在于主要软中断的处理、多个work其实也无济于事；</p>
+<p> 当然也可以使用redis那样，开启多实例方式。</p>
+<p><strong>5. Windows Server 内置NBL 负载均衡功能</strong></p>
+<p>原理和LVS的DR相似，但是相比更加暴力，请求使用广播方式，同一个交换机下RS都将受到请求，RS通过一致性算法确认自己改处理请求还是丢弃请求。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/posts/program/2016/06/28/golang-deamon.html" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">golang-守护进程</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 lehoon
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
