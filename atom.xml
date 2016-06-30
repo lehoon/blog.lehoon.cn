@@ -56,10 +56,12 @@
     <link href="http://blog.lehoon.cn/posts/program/2016/06/29/tcp-load-balancing.html"/>
     <id>http://blog.lehoon.cn/posts/program/2016/06/29/tcp-load-balancing.html</id>
     <published>2016-06-29T02:57:41.000Z</published>
-    <updated>2016-06-29T14:02:48.817Z</updated>
+    <updated>2016-06-30T02:16:47.659Z</updated>
     
     <content type="html">&lt;p&gt;&lt;strong&gt;1.   **&lt;/strong&gt;LVS&lt;strong&gt; &lt;/strong&gt;性能最强**&lt;/p&gt;
-&lt;p&gt;&lt;span style=&quot;line-height: 1.5;&quot;&gt;1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。&lt;/span&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。&lt;/li&gt;
+&lt;/ol&gt;
 &lt;p&gt;分为3种模式：&lt;/p&gt;
 &lt;p&gt;l  DR：性能最好&lt;/p&gt;
 &lt;p&gt;在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。&lt;/p&gt;
@@ -91,12 +93,10 @@
 &lt;p&gt;&lt;span style=&quot;line-height: 1.5;&quot;&gt; 连接数超过65535时，需要考虑绑定多个IP&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Tcp 转发性能要比nginx要好。&lt;/p&gt;
 &lt;p&gt;HaProxy 是默认单线程、也是最高效方式；也可以支持多线程（进程），但监控会随机请求到的业务、部分功能无法正常使用。&lt;/p&gt;
-&lt;p&gt;&lt;span style=&quot;line-height: 1.5;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;3. Nginx 专注于7层高并发，但不善于处理1w+连接数&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;要支持4层需要另外的patch，而且高连接数时性能无法和haproxy相比。&lt;/p&gt;
 &lt;p&gt;默认1个master+ 多个（核心）Worker，可充分利用多核资源。&lt;/p&gt;
 &lt;p&gt;Master和worker之间通过进程通信实现，有点像IIS5，相比II6 性能要差些。&lt;/p&gt;
-&lt;p&gt;&lt;span style=&quot;line-height: 1.5;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;**不管HaProxy还是Nginx 都存在一个问题，就是只有一个线程在做Receive，也就是无法均衡软中断。&lt;/p&gt;
 &lt;p&gt; 对于主要的四层负载，用户态执行时间很短，性能瓶颈在于主要软中断的处理、多个work其实也无济于事；&lt;/p&gt;
 &lt;p&gt; 当然也可以使用redis那样，开启多实例方式。&lt;/p&gt;
@@ -107,7 +107,8 @@
     <summary type="html">
     
       &lt;p&gt;&lt;strong&gt;1.   **&lt;/strong&gt;LVS&lt;strong&gt; &lt;/strong&gt;性能最强**&lt;/p&gt;
-&lt;p&gt;&lt;span style=&quot;line-height: 1.5;&quot;&gt;1. LVS ：Linux Virtual Server（VS），请求对于RealServe
+&lt;ol&gt;
+&lt;li&gt;LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应
     
     </summary>
     
