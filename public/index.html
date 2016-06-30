@@ -98,7 +98,7 @@
 							
 								<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
 					        
-								<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+								<a class="weibo" target="_blank" href="http://weibo.com/lehoons" title="weibo">weibo</a>
 					        
 								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
 					        
@@ -109,7 +109,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a>
+						<a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a>
 					</div>
 				</section>
 				
@@ -165,7 +165,7 @@
 					
 						<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
 			        
-						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+						<a class="weibo" target="_blank" href="http://weibo.com/lehoons" title="weibo">weibo</a>
 			        
 						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
 			        
@@ -176,6 +176,78 @@
 </nav>
 
       <div class="body-wrap">
+  
+    <article id="post-tcp-rst" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/posts/program/2016/06/29/tcp-rst.html" class="article-date">
+  	<time datetime="2016-06-29T09:17:44.000Z" itemprop="datePublished">2016-06-29</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/posts/program/2016/06/29/tcp-rst.html">tcp出现rst情况</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>正常情况tcp四层握手关闭连接，rst基本都是异常情况，整理如下：</p>
+<p><strong>1.GFW</strong></p>
+<p><strong>2.对方端口未打开，发生在连接建立</strong><br>  如果对方sync_backlog满了的话，sync简单被丢弃，表现为超时，而不会rst</p>
+<p><strong>3.close Socket 时recv buffer 不为空</strong><br>  例如，客户端发了两个请求，服务器只从buffer读取第一个请求处理完就关闭连接，tcp层认为数据没有正确提交到应用，使用rst关闭连接。</p>
+<p><strong>4.移动链路</strong><br>  移动网络下，国内是有5分钟后就回收信令，也就是IM产品，如果心跳&gt;5分钟后服务器再给客户端发消息，就会收到rst。也要查移动网络下IM 保持&lt;5min 心跳。</p>
+<p><strong>5.负载等设备</strong><br>  负载设备需要维护连接转发策略，长时间无流量，连接也会被清除，而且很多都不告诉两层机器，新的包过来时才通告rst。 Apple push 服务也有这个问题，而且是不可预期的偶发性连接被rst；rst 前第一个消息write是成功的，而第二条写才会告诉你连接被重置，曾经被它折腾没辙，因此打开每2秒一次tcp keepalive，固定5分钟tcp连接回收，而且发现连接出错时，重发之前10s内消息。</p>
+<p><strong>6.SO_LINGER 应用强制使用rst 关闭</strong><br>  该选项会直接丢弃未发送完毕的send buffer，可能造成业务错误，慎用； 当然内网服务间http client 在收到应该时主动关闭，使用改选项，会节省资源。好像曾经测试过haproxy 某种配置下，会使用rst关闭连接，少了网络交互而且没有TIME_WAIT 问题。</p>
+<p><strong>7.超过超时重传次数、网络暂时不可达</strong></p>
+<p><strong>8.TIME_WAIT 状态</strong><br>  tw_recycle = 1 时，sync timestamps 比上次小时，会被rst。</p>
+<p><strong>9.设置 connect_timeout</strong><br>  应用设置了连接超时，sync 未完成时超时了，会发送rst终止连接。</p>
+<p><strong>10.非正常包</strong><br>  连接已经关闭，seq不正确等。</p>
+<p><strong>11.keeplive超时</strong><br>  公网服务tcp keeplive最好别打开;移动网络下会增加网络负担，切容易掉线；非移动网络核心ISP设备也不一定都支持keepalive，曾经也发现过广州那边有个核心节点就不支持。</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c/">c</a></li></ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+	<a class="article-category-link" href="/categories/program/">编程</a>
+	</div>
+
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-tcp-load-balancing" class="article article-type-post" itemscope itemprop="blogPost">
   
@@ -194,7 +266,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/posts/program/2016/06/29/tcp-load-balancing.html">tcp长连接负载均衡</a>
+      <a class="article-title" href="/posts/program/2016/06/29/tcp-load-balancing.html">tcp连接负载均衡</a>
     </h1>
   
 
@@ -307,7 +379,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"> </span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"log"</span></span><br><span class="line">    <span class="string">"os"</span></span><br><span class="line">    <span class="string">"runtime"</span></span><br><span class="line">    <span class="string">"syscall"</span></span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">daemon</span><span class="params">(nochdir, noclose <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> ret, ret2 <span class="keyword">uintptr</span></span><br><span class="line">    <span class="keyword">var</span> err syscall.Errno</span><br><span class="line"> </span><br><span class="line">    darwin := runtime.GOOS == <span class="string">"darwin"</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">// already a daemon</span></span><br><span class="line">    <span class="keyword">if</span> syscall.Getppid() == <span class="number">1</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// fork off the parent process</span></span><br><span class="line">    ret, ret2, err = syscall.RawSyscall(syscall.SYS_FORK, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// failure</span></span><br><span class="line">    <span class="keyword">if</span> ret2 &lt; <span class="number">0</span> &#123;</span><br><span class="line">        os.Exit(<span class="number">-1</span>)</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// handle exception for darwin</span></span><br><span class="line">    <span class="keyword">if</span> darwin &amp;&amp; ret2 == <span class="number">1</span> &#123;</span><br><span class="line">        ret = <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// if we got a good PID, then we call exit the parent process.</span></span><br><span class="line">    <span class="keyword">if</span> ret &gt; <span class="number">0</span> &#123;</span><br><span class="line">        os.Exit(<span class="number">0</span>)</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">/* Change the file mode mask */</span></span><br><span class="line">    _ = syscall.Umask(<span class="number">0</span>)</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// create a new SID for the child process</span></span><br><span class="line">    s_ret, s_errno := syscall.Setsid()</span><br><span class="line">    <span class="keyword">if</span> s_errno != <span class="literal">nil</span> &#123;</span><br><span class="line">        log.Printf(<span class="string">"Error: syscall.Setsid errno: %d"</span>, s_errno)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> s_ret &lt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> nochdir == <span class="number">0</span> &#123;</span><br><span class="line">        os.Chdir(<span class="string">"/"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> noclose == <span class="number">0</span> &#123;</span><br><span class="line">        f, e := os.OpenFile(<span class="string">"/dev/null"</span>, os.O_RDWR, <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">if</span> e == <span class="literal">nil</span> &#123;</span><br><span class="line">            fd := f.Fd()</span><br><span class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stdin.Fd()))</span><br><span class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stdout.Fd()))</span><br><span class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stderr.Fd()))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    daemon(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">"hello"</span>)</span><br><span class="line">        time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"> </div><div class="line"><span class="keyword">import</span> (</div><div class="line">    <span class="string">"fmt"</span></div><div class="line">    <span class="string">"log"</span></div><div class="line">    <span class="string">"os"</span></div><div class="line">    <span class="string">"runtime"</span></div><div class="line">    <span class="string">"syscall"</span></div><div class="line">    <span class="string">"time"</span></div><div class="line">)</div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">daemon</span><span class="params">(nochdir, noclose <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</div><div class="line">    <span class="keyword">var</span> ret, ret2 <span class="keyword">uintptr</span></div><div class="line">    <span class="keyword">var</span> err syscall.Errno</div><div class="line"> </div><div class="line">    darwin := runtime.GOOS == <span class="string">"darwin"</span></div><div class="line"> </div><div class="line">    <span class="comment">// already a daemon</span></div><div class="line">    <span class="keyword">if</span> syscall.Getppid() == <span class="number">1</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">0</span></div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">// fork off the parent process</span></div><div class="line">    ret, ret2, err = syscall.RawSyscall(syscall.SYS_FORK, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)</div><div class="line">    <span class="keyword">if</span> err != <span class="number">0</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">// failure</span></div><div class="line">    <span class="keyword">if</span> ret2 &lt; <span class="number">0</span> &#123;</div><div class="line">        os.Exit(<span class="number">-1</span>)</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">// handle exception for darwin</span></div><div class="line">    <span class="keyword">if</span> darwin &amp;&amp; ret2 == <span class="number">1</span> &#123;</div><div class="line">        ret = <span class="number">0</span></div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">// if we got a good PID, then we call exit the parent process.</span></div><div class="line">    <span class="keyword">if</span> ret &gt; <span class="number">0</span> &#123;</div><div class="line">        os.Exit(<span class="number">0</span>)</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="comment">/* Change the file mode mask */</span></div><div class="line">    _ = syscall.Umask(<span class="number">0</span>)</div><div class="line"> </div><div class="line">    <span class="comment">// create a new SID for the child process</span></div><div class="line">    s_ret, s_errno := syscall.Setsid()</div><div class="line">    <span class="keyword">if</span> s_errno != <span class="literal">nil</span> &#123;</div><div class="line">        log.Printf(<span class="string">"Error: syscall.Setsid errno: %d"</span>, s_errno)</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> s_ret &lt; <span class="number">0</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span></div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">if</span> nochdir == <span class="number">0</span> &#123;</div><div class="line">        os.Chdir(<span class="string">"/"</span>)</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">if</span> noclose == <span class="number">0</span> &#123;</div><div class="line">        f, e := os.OpenFile(<span class="string">"/dev/null"</span>, os.O_RDWR, <span class="number">0</span>)</div><div class="line">        <span class="keyword">if</span> e == <span class="literal">nil</span> &#123;</div><div class="line">            fd := f.Fd()</div><div class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stdin.Fd()))</div><div class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stdout.Fd()))</div><div class="line">            syscall.Dup2(<span class="keyword">int</span>(fd), <span class="keyword">int</span>(os.Stderr.Fd()))</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span></div><div class="line">&#125;</div><div class="line"> </div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">    daemon(<span class="number">0</span>, <span class="number">1</span>)</div><div class="line">    <span class="keyword">for</span> &#123;</div><div class="line">        fmt.Println(<span class="string">"hello"</span>)</div><div class="line">        time.Sleep(<span class="number">1</span> * time.Second)</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
       
     </div>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>tcp长连接负载均衡 | Lehoon</title>
+  <title>tcp连接负载均衡 | Lehoon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="1.   **LVS 性能最强**
 1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。
@@ -14,7 +14,7 @@ l  DR：性能最好
 优点：性能最高、流量小
 缺点：机器都需要在同一个Vlan下，R">
 <meta property="og:type" content="article">
-<meta property="og:title" content="tcp长连接负载均衡">
+<meta property="og:title" content="tcp连接负载均衡">
 <meta property="og:url" content="http://blog.lehoon.cn/posts/program/2016/06/29/tcp-load-balancing.html">
 <meta property="og:site_name" content="Lehoon">
 <meta property="og:description" content="1.   **LVS 性能最强**
@@ -24,9 +24,9 @@ l  DR：性能最好
 在VS 和RS 使用相同的VIP，RS上抑制ARP。请求通过VS 分发，应答绕过直接回复。
 优点：性能最高、流量小
 缺点：机器都需要在同一个Vlan下，R">
-<meta property="og:updated_time" content="2016-06-29T03:43:24.690Z">
+<meta property="og:updated_time" content="2016-06-29T14:02:48.817Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="tcp长连接负载均衡">
+<meta name="twitter:title" content="tcp连接负载均衡">
 <meta name="twitter:description" content="1.   **LVS 性能最强**
 1. LVS ：Linux Virtual Server（VS），请求对于RealServer（RS）都是透明的（不修改Src），使用内核转发，相比应用实现性能要高很多。
 分为3种模式：
@@ -117,7 +117,7 @@ l  DR：性能最好
 							
 								<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
 					        
-								<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+								<a class="weibo" target="_blank" href="http://weibo.com/lehoons" title="weibo">weibo</a>
 					        
 								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
 					        
@@ -128,7 +128,7 @@ l  DR：性能最好
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a>
+						<a href="/tags/c/" style="font-size: 10px;">c</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a>
 					</div>
 				</section>
 				
@@ -184,7 +184,7 @@ l  DR：性能最好
 					
 						<a class="github" target="_blank" href="https://github.com/lehoon" title="github">github</a>
 			        
-						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+						<a class="weibo" target="_blank" href="http://weibo.com/lehoons" title="weibo">weibo</a>
 			        
 						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
 			        
@@ -211,7 +211,7 @@ l  DR：性能最好
         
   
     <h1 class="article-title" itemprop="name">
-      tcp长连接负载均衡
+      tcp连接负载均衡
     </h1>
   
 
@@ -287,6 +287,15 @@ l  DR：性能最好
   
     
 <nav id="article-nav">
+  
+    <a href="/posts/program/2016/06/29/tcp-rst.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          tcp出现rst情况
+        
+      </div>
+    </a>
   
   
     <a href="/posts/program/2016/06/28/golang-deamon.html" id="article-nav-older" class="article-nav-link-wrap">
